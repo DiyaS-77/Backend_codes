@@ -16,6 +16,7 @@ dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 class BluetoothDeviceManager:
     def __init__(self,interface=None):
+        self.interface=interface
         self.bus = dbus.SystemBus()
         self.object_manager_proxy=self.bus.get_object('org.bluez','/')
         self.object_manager=dbus.Interface(self.object_manager_proxy,'org.freedesktop.DBus.ObjectManager')

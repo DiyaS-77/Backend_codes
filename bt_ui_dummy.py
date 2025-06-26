@@ -59,12 +59,12 @@ class TestApplication(QWidget):
         #self.bluez_logger=BluezLogger("UI")
         #self.interface=self.bluez_logger.bluez_interface
         self.interface=interface
-        print(self.interface)
+        #print(self.interface)
         #self.log_manager = LogManager(interface="hci0", log_path=self.log_path)
         self.controller = Controller()
         #self.log_manager = LogManager(self.controller.interface, log_path=self.log_path)
         self.test_application_clicked()
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         self.device_address_source = None
         self.device_address_sink = None
 
@@ -96,7 +96,7 @@ class TestApplication(QWidget):
         print("Discoverable is set to ON")
         self.set_discoverable_on_button.setEnabled(False)
         self.set_discoverable_off_button.setEnabled(True)
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         self.bluetooth_device_manager.set_discoverable_on()
         timeout = int(self.discoverable_timeout_input.text())
         if timeout > 0:
@@ -109,7 +109,7 @@ class TestApplication(QWidget):
         print("Discoverable is set to OFF")
         self.set_discoverable_on_button.setEnabled(True)
         self.set_discoverable_off_button.setEnabled(False)
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         self.bluetooth_device_manager.set_discoverable_off()
         if hasattr(self, 'discoverable_timeout_timer'):
             self.discoverable_timeout_timer.stop()
@@ -119,7 +119,7 @@ class TestApplication(QWidget):
 
     def set_discovery_on(self):
         """Function for Start Discovery"""
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         print("Discovery has started")
         self.inquiry_timeout = int(self.inquiry_timeout_input.text()) * 1000
         if self.inquiry_timeout == 0:
@@ -137,14 +137,14 @@ class TestApplication(QWidget):
 
     def show_discovery_table_timeout(self):
         """Function to show the discovery table when timeout is over"""
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         self.timer.stop()
         self.bluetooth_device_manager.stop_discovery()
         self.show_discovery_table()
 
     def set_discovery_off(self):
         """Function for Stop Discovery"""
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         print("Discovery has stopped")
         self.set_discovery_off_button.setEnabled(False)
         self.timer = QTimer()
@@ -240,7 +240,7 @@ class TestApplication(QWidget):
     def br_edr_connect(self, device_address):
         "Function for connecting br-edr device"
         print(f"Attempting BR/EDR connect with {device_address}")
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         # # Check if already connected
         # if self.bluetooth_device_manager.is_device_connected(device_address):
         #     QMessageBox.information(self, "Already Connected", f"{device_address} is already connected.")
@@ -254,7 +254,7 @@ class TestApplication(QWidget):
     def le_connect(self,device_address):
         """Function for le_connect method"""
         print("LE_Connect is ongoing ")
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         self.bluetooth_device_manager.le_connect(device_address)
 
     def refresh(self):
@@ -299,7 +299,7 @@ class TestApplication(QWidget):
         self.stop_streaming_button.setEnabled(True)
 
         # Create BluetoothDeviceManager instance and start streaming
-        self.bluetooth_device_manager = BluetoothDeviceManager()
+        self.bluetooth_device_manager = BluetoothDeviceManager(self.interface)
         success = self.bluetooth_device_manager.start_streaming(self.device_address_source, audio_path)
 
         if not success:
@@ -980,24 +980,4 @@ class TestApplication(QWidget):
             self.profile_methods_widget.setLayout(self.profile_methods_layout)
             self.test_application_window.findChild(QGridLayout).addWidget(self.profile_methods_widget, 2, 2, 3, 1)
 
-        # def send_file(self):
-        #     file_path = self.opp_location_input.text()
-        #     device_index = self.device_selector.currentIndex()
-        #     device_address = self.device_selector.itemData(device_index)
-        #
-        #     if not file_path or not device_address:
-        #         QMessageBox.warning(None, "OPP", "Please select a device and a file.")
-        #         return
-        #
-        #     self.send_file_button.setEnabled(False)
-        #     self.send_file_button.setText("Sending...")
-        #
-        #     success = self.bluetooth_device_manager.send_file_via_obex(device_address, file_path)
-        #
-        #     self.send_file_button.setEnabled(True)
-        #     self.send_file_button.setText("Send File")
-        #
-        #     if success:
-        #         QMessageBox.information(None, "OPP", "File sent successfully!")
-        #     else:
-        #         QMessageBox.critical(None, "OPP", "File not sent properly !")
+      

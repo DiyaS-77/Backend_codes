@@ -15,11 +15,12 @@ from dbus.mainloop.glib import DBusGMainLoop
 dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 class BluetoothDeviceManager:
-    def __init__(self):
+    def __init__(self,interface=None):
         self.bus = dbus.SystemBus()
         self.object_manager_proxy=self.bus.get_object('org.bluez','/')
         self.object_manager=dbus.Interface(self.object_manager_proxy,'org.freedesktop.DBus.ObjectManager')
-        self.list_adapters()
+        #self.list_adapters()
+        self.adapter_path=f"/org/bluez/{self.interface}"
         #self.adapter_path = '/org/bluez/hci1'
         #self.adapter_proxy = self.bus.get_object('org.bluez', self.adapter_path)
         #self.adapter = dbus.Interface(self.adapter_proxy, 'org.bluez.Adapter1')
@@ -207,14 +208,14 @@ class BluetoothDeviceManager:
     def set_discoverable_on(self):
         """Sets the Bluetooth device to be discoverable."""
         print("Setting Bluetooth device to be discoverable...")
-        command = "hciconfig hci1 piscan"
+        command = f"hciconfig {self.interface} piscan"
         subprocess.run(command, shell = True)
         print("Bluetooth device is now discoverable.")
 
     def set_discoverable_off(self):
         """Sets the Bluetooth device to be non-discoverable."""
         print("Setting Bluetooth device to be non-discoverable...")
-        command = "hciconfig hci1 noscan"
+        command = f"hciconfig {self.interface} noscan"
         subprocess.run(command, shell = True)
         print("Bluetooth device is now non-discoverable.")
 

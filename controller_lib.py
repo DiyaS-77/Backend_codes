@@ -1,12 +1,10 @@
 import re
 import time
 
-from bt_ui_components import hci_commands as hci
-from bt_ui_components.log_manager import LogManager
-
-from test_framework.utils import run
-from test_framework.utils import check_command_running
-from test_framework.utils import kill_process
+from test_automation.UI.Backend_lib.Linux import hci_commands as hci
+from test_automation.UI.utils import run
+from test_automation.UI.utils import check_command_running
+from test_automation.UI.utils import kill_process
 # from utils import run
 # from utils import check_command_running
 # from utils import kill_process
@@ -52,16 +50,13 @@ class Controller:
     def get_controller_interface_details(self):
         """ Returns the controllers interface and bus details. """
         self.interface = self.controllers_list[self.bd_address]
-        print('@@@@@@@@@@@@@@@@@@@@@@@@')
-        print(self.interface)
-        #self.interface=interface
         result = run(self.log,f"hciconfig -a {self.interface} | grep Bus")
         return f"Interface: {self.interface} \t Bus: {result.stdout.split('Bus:')[1].strip()}"
 
     def get_controller_details(self):
         """ Returns the details of the controller selected. """
         run(self.log, f"hciconfig -a {self.interface} up")
-        print(f'INterface selected--------------{self.interface}')
+        #print(f'INterface selected--------------{self.interface}')
         result = run(self.log,f"hciconfig -a {self.interface}")
         details = ""
         result = result.stdout.split('\n')
@@ -84,41 +79,7 @@ class Controller:
             if match := re.match('Manufacturer: (.*)', line):
                 details = '\n'.join([details, f"Manufacturer: {match[1]}"])
         return details
-    '''
-    def start_dump_logs(self):
-        """ Starts the hcidump logs and redirects to the file. """
-        self.log.debug(self.log.log_path)
-        hcidump_command = '/usr/local/bluez/bluez-tools/bin/hcidump -i {} -Xt'.format(self.interface)
-        hcidump_logs = '_'.join([self.interface, 'hcidump.log'])
-        self.hcidump_log_name = '/'.join([self.log.log_path, hcidump_logs])
-        run(self.log, hcidump_command, self.hcidump_log_name)
-        time.sleep(2)
-        self.log.info(f"hcidump process has started {self.hcidump_log_name}")
-        self.logfile_fd = open(self.hcidump_log_name, 'r')
-        self.file_position = self.logfile_fd.tell()
-        self.hci_dump_started = True
-        return True
 
-
-
-
-    def stop_dump_logs(self):
-        """ To kill the hcidump process.
-
-        Returns:
-            True: If the processes are killed else false.
-        """
-        self.log.debug("Stopping hcidump process...")
-        hcidump_command = 'hcidump -i {}'.format(self.interface)
-        process_list = check_command_running(self.log, hcidump_command)
-        if process_list:
-            self.log.debug(f"Killing hcidump process: {process_list}.")
-            return kill_process(self.log, process_list)
-        else:
-            self.log.error("hcidump process is not running.")
-            self.hci_dump_started = False
-            return False
-    '''
     def convert_mac_little_endian(self, address):
         """ Converts BD_Address to little endian.
 ;
